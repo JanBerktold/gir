@@ -8,7 +8,7 @@ import (
 
 var ListCmd = &cobra.Command{
 	Use:   "list [<owner/name>]",
-	Short: "",
+	Short: "Lists all issues in one repository",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		data, err := LoadData()

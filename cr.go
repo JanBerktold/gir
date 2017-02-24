@@ -6,9 +6,9 @@ import (
 	"os"
 )
 
-var CDCmd = &cobra.Command{
-	Use:   "cd <owner/name>",
-	Short: "",
+var CRCmd = &cobra.Command{
+	Use:   "cr <owner/name>",
+	Short: "Selects an active repository which gir list and gir show work against",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		data, err := LoadData()
@@ -52,5 +52,5 @@ var CDCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(CDCmd)
+	RootCmd.AddCommand(CRCmd)
 }

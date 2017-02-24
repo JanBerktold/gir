@@ -1,5 +1,4 @@
 ## gir is a simple, offline github issues reader in your terminal.
-## This project is not yet in a usable state.
 
 It utilizies the new Github GraphQL API which drastically reduces the amount of requests which have to be sent over the wire to download the issues. On the downside, this requires each user to join the [github early-access program](https://github.com/prerelease/agreement) and create a personal access token which has to be exposed as the *GITHUB_TOKEN* environment variable.
 
