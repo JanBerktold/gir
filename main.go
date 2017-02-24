@@ -7,8 +7,13 @@ import (
 	"strings"
 )
 
+type RepoIdentifier struct {
+	Owner string
+	Name  string
+}
+
 type Data struct {
-	CurrentRepo  string
+	CurrentRepo  *RepoIdentifier
 	Repositories []Repository
 }
 
@@ -17,6 +22,11 @@ var file = os.Getenv("HOME") + "/.github_issues"
 func LoadData() (Data, error) {
 	f, err := os.Open(file)
 	if err != nil {
+		p := err.(*os.PathError)
+		//TODO: hacky
+		if p.Err.Error() == "no such file or directory" {
+			return Data{}, nil
+		}
 		return Data{}, err
 	}
 	defer f.Close()

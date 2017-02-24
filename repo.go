@@ -13,6 +13,7 @@ type Issue struct {
 	Body   string `json:"body"`
 	State  string `json:"state"`
 	id     string `json:"id"`
+	Number int    `json:"number"`
 }
 
 type Issues struct {
