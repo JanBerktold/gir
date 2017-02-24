@@ -1,10 +1,10 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/spf13/cobra"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
+	"github.com/spf13/cobra"
 	"os"
 	"strings"
 )
@@ -47,8 +47,9 @@ func SaveData(data Data) error {
 		return err
 	}
 	defer f.Close()
-
-	return json.NewEncoder(gzip.NewWriter(f)).Encode(data)
+	writer := gzip.NewWriter(f)
+	defer writer.Close()
+	return json.NewEncoder(writer).Encode(data)
 }
 
 func ParseRepo(repo string) (owner, name string) {

@@ -1,10 +1,50 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
+
 const ISSUE_LIMIT = 100
 
 type Entity struct {
 	Name string `json:"login"`
+}
+
+type Pagination struct {
+	Cursor string `json:"endCursor"`
+}
+
+type Label struct {
+	Name string `json:"name"`
+}
+
+type TimelineItem struct {
+	Type string `json:"__typename"`
+
+	// IssueComment <https://developer.github.com/early-access/graphql/object/issuecomment/>
+	Author Entity `json:"author"`
+	Editor Entity `json:"editor"`
+	Body string `json:"body"`
+	CreatedAt time.Time `json:"createdAt"`
+
+	// ClosedEvent <https://developer.github.com/early-access/graphql/object/closedevent/>
+	Actor Entity `json:"actor"`
+	// +CreatedAt
+
+	// ReopenedEvent <https://developer.github.com/early-access/graphql/object/reopenedevent/>
+	// +Actor
+	// +CreatedAt
+
+	// LabeledEvent <https://developer.github.com/early-access/graphql/object/labeledevent/>
+	// +Actor
+	// +CreatedAt
+	Labels []Label `json:"label"`
+}
+
+type Timeline struct {
+	Timeline []TimelineItem `json:"nodes"`
+	NextPage Pagination `json:"pageInfo"`
 }
 
 type Issue struct {
@@ -15,16 +55,15 @@ type Issue struct {
 	State  string `json:"state"`
 	Id     string `json:"id"`
 	Number int    `json:"number"`
+	Timeline Timeline  `json:"timeline"`
 }
 
-type IssuePagination struct {
-	Cursor string `json:"endCursor"`
-}
 
 type Issues struct {
-	Issues []Issue `json:"nodes"`
-	NextPage IssuePagination `json:"pageInfo"`
+	Issues   []Issue         `json:"nodes"`
+	NextPage Pagination `json:"pageInfo"`
 }
+
 
 type Repository struct {
 	Owner  Entity `json:"owner"`
@@ -40,7 +79,7 @@ query ($owner: String!, $name: String!) {
     }
     name
     issues(first: 100) {
-      pageInfo {
+    	pageInfo {
         endCursor
       }
       nodes {
@@ -51,6 +90,39 @@ query ($owner: String!, $name: String!) {
         title
         updatedAt
         state
+        timeline(first:100) {
+          pageInfo {
+            endCursor
+          }
+          nodes {
+            __typename
+            ... on IssueComment {
+              author {
+                login
+              }
+              body
+              createdAt
+            }
+	    ... on ClosedEvent {
+              actor {
+                login
+              }
+              createdAt
+	    }
+	    ... on ReopenedEvent { 
+              actor {
+                login
+              }
+              createdAt
+	    }
+	    ... on LabeledEvent {
+              actor {
+                login
+              }
+              createdAt
+	    }
+         }
+        }
         editor {
           login
         }
@@ -71,7 +143,7 @@ query ($owner: String!, $name: String!, $after: String!) {
     }
     name
     issues(first: 100, after: $after) {
-      pageInfo {
+    	pageInfo {
         endCursor
       }
       nodes {
@@ -82,6 +154,39 @@ query ($owner: String!, $name: String!, $after: String!) {
         title
         updatedAt
         state
+        timeline(first:100) {
+          pageInfo {
+            endCursor
+          }
+          nodes {
+            __typename
+            ... on IssueComment {
+              author {
+                login
+              }
+              body
+              createdAt
+            }
+	    ... on ClosedEvent {
+              actor {
+                login
+              }
+              createdAt
+	    }
+	    ... on ReopenedEvent { 
+              actor {
+                login
+              }
+              createdAt
+	    }
+	    ... on LabeledEvent {
+              actor {
+                login
+              }
+              createdAt
+	    }
+         }
+        }
         editor {
           login
         }
@@ -91,8 +196,7 @@ query ($owner: String!, $name: String!, $after: String!) {
       }
     }
   }
-}
-`
+}`
 
 type Wrapper struct {
 	Message string `json:"message"`
@@ -141,7 +245,7 @@ func LoadRepo(owner, name string) (Repository, error) {
 
 			repo.Data.Repository.Issues.Issues = append(repo.Data.Repository.Issues.Issues, repo2.Data.Repository.Issues.Issues...)
 
-			if len(repo2.Data.Repository.Issues.NextPage.Cursor) > 0  {
+			if len(repo2.Data.Repository.Issues.NextPage.Cursor) > 0 {
 				after = repo2.Data.Repository.Issues.NextPage.Cursor
 			} else {
 				break

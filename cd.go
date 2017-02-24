@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"fmt"
+	"github.com/spf13/cobra"
 	"os"
 )
 
@@ -32,15 +32,15 @@ var CDCmd = &cobra.Command{
 			if repo.Owner.Name == targetOwner && repo.Name == targetName {
 				data.CurrentRepo = &RepoIdentifier{
 					Owner: targetOwner,
-					Name: targetName,
-			}
+					Name:  targetName,
+				}
 				goto finished
 			}
 
 		}
 
 		fmt.Printf("Repository %s/%s is not cached. You may want to run gir add %s/%s\n",
-					targetOwner, targetName, targetOwner, targetName)
+			targetOwner, targetName, targetOwner, targetName)
 		return
 
 	finished:
