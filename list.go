@@ -38,11 +38,7 @@ var ListCmd = &cobra.Command{
 		for _, repo := range data.Repositories {
 			if repo.Owner.Name == targetOwner && repo.Name == targetName {
 				for _, issue := range repo.Issues.Issues {
-					if len(issue.Editor.Name) > 0 {
-						fmt.Printf("%d: %s (%s, edited by %s)\n", issue.Number, issue.Title, issue.Author.Name, issue.Editor.Name)
-					} else {
-						fmt.Printf("%d: %s (%s)\n", issue.Number, issue.Title, issue.Author.Name)
-					}
+					fmt.Printf("%d/%s: %s (%s)\n", issue.Number, issue.State, issue.Title, issue.Author.Name)
 				}
 				return
 			}
