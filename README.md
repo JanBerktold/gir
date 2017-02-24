@@ -11,13 +11,13 @@ It utilizies the new Github GraphQL API which drastically reduces the amount of 
 		Go to https://github.com/JanBerktold/gir for further information.
 
     Usage:
-      gir [command]
+        gir [command]
 
     Available Commands:
-       add         Cache an additional repository's issues
-       cd          
-       list        
-       repos       Gives an overview of all cached repositories
-       show        
-       update      Updates cached issues
-    
+        add         Cache an additional repository's issues
+        cr          Selects an active repository which gir list and gir show work against
+        list        Lists all issues in one repository
+        repos       Gives an overview of all cached repositories
+        show        Gives detailed information about an issue including comments
+        update      Updates cached issues
+   
