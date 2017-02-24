@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -11,12 +12,27 @@ type Data struct {
 	Repositories []Repository
 }
 
+var file = os.Getenv("HOME") + "/.github_issues"
+
 func LoadData() (Data, error) {
-	return Data{}, nil
+	f, err := os.Open(file)
+	if err != nil {
+		return Data{}, err
+	}
+	defer f.Close()
+
+	var data Data
+	return data, json.NewDecoder(f).Decode(&data)
 }
 
 func SaveData(data Data) error {
-	return nil
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return json.NewEncoder(f).Encode(data)
 }
 
 func ParseRepo(repo string) (owner, name string) {
