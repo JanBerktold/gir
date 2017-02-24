@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"compress/gzip"
 	"fmt"
 	"os"
 	"strings"
@@ -32,7 +33,11 @@ func LoadData() (Data, error) {
 	defer f.Close()
 
 	var data Data
-	return data, json.NewDecoder(f).Decode(&data)
+	rd, err := gzip.NewReader(f)
+	if err != nil {
+		return Data{}, nil
+	}
+	return data, json.NewDecoder(rd).Decode(&data)
 }
 
 func SaveData(data Data) error {
@@ -42,7 +47,7 @@ func SaveData(data Data) error {
 	}
 	defer f.Close()
 
-	return json.NewEncoder(f).Encode(data)
+	return json.NewEncoder(gzip.NewWriter(f)).Encode(data)
 }
 
 func ParseRepo(repo string) (owner, name string) {
