@@ -6,18 +6,9 @@ import (
 	"strings"
 )
 
-type Repo struct {
-	Owner string
-	Name  string
-}
-
 type Data struct {
 	CurrentRepo  string
-	Repositories []Repo
-}
-
-func LoadRepo(owner, name string) (Repo, error) {
-	return Repo{}, nil
+	Repositories []Repository
 }
 
 func LoadData() (Data, error) {

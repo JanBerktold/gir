@@ -8,7 +8,7 @@ import (
 
 var UpdateCmd = &cobra.Command{
 	Use:   "update [<owner/name>]",
-	Short: "Updates cached data for specified repository.\nIf not repository is given, all data is updated.",
+	Short: "Updates cached issues",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// parse whether the user specified a target repo
@@ -29,7 +29,7 @@ var UpdateCmd = &cobra.Command{
 
 		if len(targetOwner) == 0 {
 			for i, repo := range data.Repositories {
-				newRepo, err := LoadRepo(repo.Owner, repo.Name)
+				newRepo, err := LoadRepo(repo.Owner.Name, repo.Name)
 				if err != nil {
 					fmt.Printf("Failed to load repo %s/%s: %q\n", repo.Owner, repo.Name, err.Error())
 				} else {
@@ -38,8 +38,8 @@ var UpdateCmd = &cobra.Command{
 			}
 		} else {
 			for i, repo := range data.Repositories {
-				if repo.Owner == targetOwner && repo.Name == targetName {
-					newRepo, err := LoadRepo(repo.Owner, repo.Name)
+				if repo.Owner.Name == targetOwner && repo.Name == targetName {
+					newRepo, err := LoadRepo(repo.Owner.Name, repo.Name)
 					if err != nil {
 						fmt.Printf("Failed to load repo %s/%s: %q\n", repo.Owner, repo.Name, err.Error())
 						os.Exit(-1)
