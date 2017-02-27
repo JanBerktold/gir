@@ -9,6 +9,19 @@ import (
 var CRCmd = &cobra.Command{
 	Use:   "cr <owner/name>",
 	Short: "Selects an active repository which gir list and gir show work against",
+	Long: "gir cr <owner/name> allows you to set a default repository for gir list and gir show.\n" +
+		"Example:\n" +
+		"\t> gir repos\n" +
+		"\t\tgolang/go (1600 issues)\n" +
+		"\t> gir list\n" +
+		"\t\tNo repository specified. You either have to specify a repo as an argument or enter a scope.\n" +
+		"\t> gir cr golang/go\n" +
+		"\t> gir list\n" +
+		"\t\t1/CLOSED: Make Golang awesome (bradfitz)\n" +
+		"\t\t2/CLOSED: Think about generics (robpike)\n" +
+		"\t\t3/OPEN: Gir is a hip github issues reader (JanBerktold)\n" +
+		"\t> gir show 3\n" +
+		"\t\t> issues info here\n",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		data, err := LoadData()
@@ -17,15 +30,14 @@ var CRCmd = &cobra.Command{
 			os.Exit(-1)
 		}
 
-		if len(args) != 1 {
-			fmt.Println("Invalid number of arguments")
-			os.Exit(-1)
+		var targetOwner string
+		var targetName string
+		if len(args) > 0 {
+			targetOwner, targetName = ParseRepo(args[0])
 		}
-
-		targetOwner, targetName := ParseRepo(args[0])
 		if len(targetOwner) == 0 {
-			fmt.Printf("Invalid repo name %s/%s\n", args[0])
-			os.Exit(-1)
+			data.CurrentRepo = nil
+			goto finished
 		}
 
 		for _, repo := range data.Repositories {
@@ -41,6 +53,7 @@ var CRCmd = &cobra.Command{
 
 		fmt.Printf("Repository %s/%s is not cached. You may want to run gir add %s/%s\n",
 			targetOwner, targetName, targetOwner, targetName)
+
 		return
 
 	finished:
