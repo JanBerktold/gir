@@ -38,6 +38,7 @@ var AddCmd = &cobra.Command{
 		repo, err := LoadRepo(targetOwner, targetName)
 		if err != nil {
 			fmt.Printf("Failed to cache repository %s/%s: %q\n", targetOwner, targetName, err.Error())
+			os.Exit(-1)
 		}
 		data.Repositories = append(data.Repositories, repo)
 
