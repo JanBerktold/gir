@@ -23,9 +23,9 @@ type TimelineItem struct {
 	Type string `json:"__typename"`
 
 	// IssueComment <https://developer.github.com/early-access/graphql/object/issuecomment/>
-	Author Entity `json:"author"`
-	Editor Entity `json:"editor"`
-	Body string `json:"body"`
+	Author    Entity    `json:"author"`
+	Editor    Entity    `json:"editor"`
+	Body      string    `json:"body"`
 	CreatedAt time.Time `json:"createdAt"`
 
 	// ClosedEvent <https://developer.github.com/early-access/graphql/object/closedevent/>
@@ -44,26 +44,24 @@ type TimelineItem struct {
 
 type Timeline struct {
 	Timeline []TimelineItem `json:"nodes"`
-	NextPage Pagination `json:"pageInfo"`
+	NextPage Pagination     `json:"pageInfo"`
 }
 
 type Issue struct {
-	Author Entity `json:"author"`
-	Editor Entity `json:"editor"`
-	Title  string `json:"title"`
-	Body   string `json:"body"`
-	State  string `json:"state"`
-	Id     string `json:"id"`
-	Number int    `json:"number"`
-	Timeline Timeline  `json:"timeline"`
+	Author   Entity   `json:"author"`
+	Editor   Entity   `json:"editor"`
+	Title    string   `json:"title"`
+	Body     string   `json:"body"`
+	State    string   `json:"state"`
+	Id       string   `json:"id"`
+	Number   int      `json:"number"`
+	Timeline Timeline `json:"timeline"`
 }
-
 
 type Issues struct {
-	Issues   []Issue         `json:"nodes"`
+	Issues   []Issue    `json:"nodes"`
 	NextPage Pagination `json:"pageInfo"`
 }
-
 
 type Repository struct {
 	Owner  Entity `json:"owner"`
@@ -72,71 +70,7 @@ type Repository struct {
 }
 
 var query = `
-query ($owner: String!, $name: String!) {
-  repository(owner: $owner, name: $name) {
-    owner {
-      login
-    }
-    name
-    issues(first: 100) {
-    	pageInfo {
-        endCursor
-      }
-      nodes {
-        id
-        body
-        createdAt
-        number
-        title
-        updatedAt
-        state
-        timeline(first:100) {
-          pageInfo {
-            endCursor
-          }
-          nodes {
-            __typename
-            ... on IssueComment {
-              author {
-                login
-              }
-              body
-              createdAt
-            }
-	    ... on ClosedEvent {
-              actor {
-                login
-              }
-              createdAt
-	    }
-	    ... on ReopenedEvent { 
-              actor {
-                login
-              }
-              createdAt
-	    }
-	    ... on LabeledEvent {
-              actor {
-                login
-              }
-              createdAt
-	    }
-         }
-        }
-        editor {
-          login
-        }
-        author {
-          login
-        }
-      }
-    }
-  }
-}
-`
-
-var followUpQuery = `
-query ($owner: String!, $name: String!, $after: String!) {
+query ($owner: String!, $name: String!, $after: String) {
   repository(owner: $owner, name: $name) {
     owner {
       login
@@ -196,7 +130,8 @@ query ($owner: String!, $name: String!, $after: String!) {
       }
     }
   }
-}`
+}
+`
 
 type Wrapper struct {
 	Message string `json:"message"`
@@ -230,7 +165,7 @@ func LoadRepo(owner, name string) (Repository, error) {
 		after := repo.Data.Repository.Issues.NextPage.Cursor
 		for {
 			var repo2 Wrapper
-			err := client.Execute(followUpQuery, map[string]interface{}{
+			err := client.Execute(query, map[string]interface{}{
 				"owner": owner,
 				"name":  name,
 				"after": after,
